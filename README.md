@@ -2,6 +2,10 @@
 
 Simple Addon for blender, for setting your vertex alpha channel in specific tones
 
+## Differences from the main branch
+
+This fork has a modified script that works with blender 3.4. Note that you must be in vertex paint mode.
+
 ## Installation
 
 ```
