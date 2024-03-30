@@ -13,32 +13,18 @@ import bpy
 import bmesh
 
 def set_vertex_alpha(alpha):
-    # get the active object and its data
-    obj = bpy.context.active_object
-    mesh = obj.data
-
-    # enter edit mode and get the bmesh
-    bpy.ops.object.mode_set(mode='EDIT')
-    bm = bmesh.from_edit_mesh(mesh)
-
-    # make a list of selected vertices
-    selected_verts = [v for v in bm.verts if v.select]
-
-    # get the active vertex color layer
-    col_layer = bm.loops.layers.color.active
-
-    # assign the alpha value to the selected vertices, overwriting the existing values
-    for vert in selected_verts:
-        for loop in vert.link_loops:
-            color = loop[col_layer]
-            color[3] = alpha  # set the alpha value
-            loop[col_layer] = color
-
-    # update the mesh with the modified bmesh
-    bmesh.update_edit_mesh(mesh)
-
-    # exit edit mode
-    bpy.ops.object.mode_set(mode='OBJECT')
+    import bpy
+    assert bpy.context.mode == 'PAINT_VERTEX'
+    mesh = bpy.context.object.data
+    ca = mesh.color_attributes.active_color
+    if ca.domain == 'POINT':
+        for vi, v in enumerate(mesh.vertices):
+            if v.select:
+                ca.data[vi].color[3] = alpha
+    elif ca.domain == 'CORNER':
+        for li, l in enumerate(mesh.loops):
+            if mesh.vertices[l.vertex_index].select:
+                ca.data[li].color[3] = alpha
 
 class SetVertexAlphaOperator(bpy.types.Operator):
     """Set the alpha value of selected vertices"""
